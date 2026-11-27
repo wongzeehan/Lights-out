@@ -9,9 +9,9 @@ let sound=true,ctx,engine=null,buffers=null,loading=null;
 try{sound=localStorage.getItem('lights-out-sound')!=='off'}catch{}
 function soundLabel(){$('sound').textContent=sound?'🔊 Sound on':'🔇 Sound off';$('sound').setAttribute('aria-pressed',String(sound))}
 function stopEngine(){if(engine){try{engine.stop()}catch{}engine=null}}
-function loadAudio(){if(buffers)return Promise.resolve();if(loading)return loading;try{ctx=ctx||new (window.AudioContext||window.webkitAudioContext)();loading=Promise.all(['revving.mp3','launch.mp3'].map(async p=>{const r=await fetch(p);if(!r.ok)throw Error(p);return ctx.decodeAudioData(await r.arrayBuffer())})).then(b=>{buffers=b}).catch(e=>{loading=null;throw e});return loading}catch(e){return Promise.reject(e)}}
+function loadAudio(){if(buffers)return Promise.resolve();if(loading)return loading;try{ctx=ctx||new (window.AudioContext||window.webkitAudioContext)();loading=Promise.all(['revving-stitched.mp3','launch.mp3'].map(async p=>{const r=await fetch(p);if(!r.ok)throw Error(p);return ctx.decodeAudioData(await r.arrayBuffer())})).then(b=>{buffers=b}).catch(e=>{loading=null;throw e});return loading}catch(e){return Promise.reject(e)}}
 function playClip(i,loop){stopEngine();if(!sound||!buffers||ctx.state!=='running')return;const s=ctx.createBufferSource();s.buffer=buffers[i];s.loop=loop;s.connect(ctx.destination);s.start();engine=s;s.onended=()=>{if(engine===s)engine=null}}
-function startEngine(){playClip(0,true)}
+function startEngine(){playClip(0,false)}
 function rev(n){}
 function launchSound(){playClip(1,false)}
 $('sound').onclick=()=>{sound=!sound;try{localStorage.setItem('lights-out-sound',sound?'on':'off')}catch{}if(!sound)stopEngine();else loadAudio().catch(()=>{});soundLabel()};soundLabel();loadAudio().catch(()=>{});
